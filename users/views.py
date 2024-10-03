@@ -1,4 +1,6 @@
 from django.shortcuts import render
+
+from projects.models import Project
 from .models import Profile
 
 def profiles(request):
@@ -12,10 +14,13 @@ def profile(request, pk):
 
     top_skills = prof.skill_set.exclude(description__exact="")
     other_skills = prof.skill_set.filter(description="")
-
+    
+    user_projects = Project.objects.filter(owner=prof)
+    
     context = {
         'profile': prof,
         'top_skills': top_skills,
         'other_skills': other_skills,
+        'projects': user_projects,
     }
     return render(request, 'users/profile.html', context)
