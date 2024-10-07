@@ -2,16 +2,20 @@ from .models import Profile
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save, post_delete
 
-def profile_updated(sender, instance, created, **kwargs):
-    print("Profile Saved!")
-    print("Sender:", sender)
-    print("Instance:", instance)
-    print("Created:", created)
+def create_profile(sender, instance, created, **kwargs):
+    if created:
+        user = instance
+        profile = Profile.objects.create(
+            user=user,
+            username=user.username,
+            email=user.email,
+            name=user.first_name
+        )
 
 def delete_user(sender, instance,  **kwargs):
-    print("Deleting user...")
+    user = instance.user
+    user.delete()
 
-
-post_save.connect(profile_updated, sender=Profile)    
+post_save.connect(create_profile, sender=User)    
 
 post_delete.connect(delete_user, sender=Profile)
